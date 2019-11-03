@@ -146,8 +146,10 @@ pub fn pick(
 
     serve(&sel)?;
 
-    // we write the filtered history
-    let idx: Vec<HashSet<Multi>> = idx.iter().filter(|x| x.deref() != &sel).cloned().collect();
+    // we push the pick item to the end of the queue
+    let mut idx: Vec<HashSet<Multi>> = idx.iter().filter(|x| x.deref() != &sel).cloned().collect();
+    idx.push(sel);
+
     let file = File::create(hist_idx)?;
     let f = BufWriter::new(file);
     serde_cbor::to_writer(f, &idx)?;

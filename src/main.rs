@@ -80,13 +80,13 @@ fn main() -> Result<(), Error> {
     };
     let history_idx = {
         let mut path = history_dir.clone();
-        path.push("index.json");
+        path.push("index.cbor");
         path
     };
     let idx: Vec<HashSet<Multi>> = {
         let file = File::open(&history_idx)?;
         let reader = BufReader::new(file);
-        serde_json::from_reader(reader)?
+        serde_cbor::from_reader(reader).unwrap_or(Vec::new())
     };
 
     match opts.subcmd {

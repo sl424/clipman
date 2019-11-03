@@ -95,7 +95,7 @@ pub fn watch(
         idx.push(sources);
         let file = File::create(hist_idx)?;
         let f = BufWriter::new(file);
-        serde_json::to_writer(f, &idx)?;
+        serde_cbor::to_writer(f, &idx)?;
     }
 }
 
@@ -127,7 +127,7 @@ pub fn clear(
     let idx: Vec<HashSet<Multi>> = idx.iter().filter(|x| x.deref() != &sel).cloned().collect();
     let file = File::create(hist_idx)?;
     let f = BufWriter::new(file);
-    serde_json::to_writer(f, &idx)?;
+    serde_cbor::to_writer(f, &idx)?;
 
     Ok(())
 }
@@ -150,7 +150,7 @@ pub fn pick(
     let idx: Vec<HashSet<Multi>> = idx.iter().filter(|x| x.deref() != &sel).cloned().collect();
     let file = File::create(hist_idx)?;
     let f = BufWriter::new(file);
-    serde_json::to_writer(f, &idx)?;
+    serde_cbor::to_writer(f, &idx)?;
 
     Ok(())
 }

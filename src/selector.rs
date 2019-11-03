@@ -60,7 +60,7 @@ pub fn select(
         return Ok(None);
     };
 
-    Ok(Some(guide[&output.to_string()].clone()))
+    Ok(Some(guide[&output.trim().to_string()].clone()))
 }
 
 fn process(

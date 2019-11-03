@@ -33,7 +33,11 @@ pub fn watch(
     loop {
         sleep(Duration::from_millis(200));
 
-        let mime_types = get_mime_types(ClipboardType::Regular, Seat::Unspecified)?;
+        let mime_types = match get_mime_types(ClipboardType::Regular, Seat::Unspecified) {
+            Ok(mimes) => mimes,
+            Err(paste::Error::ClipboardEmpty) => continue,
+            Err(err) => return Err(err)?,
+        };
         let mut sources = HashSet::new();
         let mut got_text = false;
 

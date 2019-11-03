@@ -66,6 +66,13 @@ enum SubCommand {
         #[structopt(short = "a", long = "all")]
         all: bool,
     },
+    /// Export history index to stdout
+    #[structopt(name = "export")]
+    Export {
+        /// Format
+        #[structopt(short = "f", long = "format", default_value = "json")]
+        format: String,
+    },
 }
 
 fn main() -> Result<(), Error> {
@@ -102,6 +109,7 @@ fn main() -> Result<(), Error> {
             toolargs,
             all,
         } => actions::clear(idx, &history_dir, &history_idx, max, tool, toolargs, all)?,
+        SubCommand::Export { format } => actions::export(idx, format)?,
     }
 
     Ok(())

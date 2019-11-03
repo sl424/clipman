@@ -3,7 +3,7 @@ use failure::Error;
 use std::collections::HashSet;
 use std::fs::File;
 use std::io::BufWriter;
-use std::io::Read;
+use std::io::{stdout, Read};
 use std::ops::Deref;
 use std::path::PathBuf;
 use std::{thread::sleep, time::Duration};
@@ -151,6 +151,16 @@ pub fn pick(
     let file = File::create(hist_idx)?;
     let f = BufWriter::new(file);
     serde_cbor::to_writer(f, &idx)?;
+
+    Ok(())
+}
+
+pub fn export(idx: Vec<HashSet<Multi>>, format: String) -> Result<(), Error> {
+    if format != "json".to_string() {
+        return Err(format_err!("Unsupported output format."));
+    };
+    let f = BufWriter::new(stdout());
+    serde_json::to_writer(f, &idx)?;
 
     Ok(())
 }

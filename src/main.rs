@@ -118,9 +118,14 @@ fn main() -> Result<(), Error> {
 fn serve(idx: &HashSet<Multi>) -> Result<(), Error> {
     let mut sources = Vec::new();
     for m in idx {
+        let mime = if m.mime == "text/plain;charset=utf-8" {
+            MimeType::Text
+        } else {
+            MimeType::Specific(m.mime.clone())
+        };
         sources.push(MimeSource {
             source: Source::Bytes(&m.source),
-            mime_type: MimeType::Specific(m.mime.clone()),
+            mime_type: mime,
         });
     }
 

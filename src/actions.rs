@@ -7,7 +7,7 @@ use std::io::{stdout, Read};
 use std::ops::Deref;
 use std::path::PathBuf;
 use std::{thread::sleep, time::Duration};
-use wl_clipboard_rs::paste::{self, get_contents, get_mime_types, ClipboardType, MimeType, Seat};
+use wl_clipboard_rs::paste::{self, get_contents, get_mime_types, ClipboardType, Seat};
 
 pub fn watch(
     idx: Vec<HashSet<Multi>>,
@@ -45,20 +45,20 @@ pub fn watch(
             }
 
             // we reduce the strain by only asking one of the typical plain text formats, which we expect to be all of same content
-            let mime = if text_mimes.contains(&mime.as_str()) {
+            let (mime, paste_mime) = if text_mimes.contains(&mime.as_str()) {
                 if got_text {
                     continue;
                 }
                 got_text = true;
-                "text/plain;charset=utf-8".to_string()
+                ("text/plain;charset=utf-8".to_string(), paste::MimeType::Text)
             } else {
-                mime.to_string()
+                (mime.to_string(), paste::MimeType::Specific(&mime))
             };
 
             let result = get_contents(
                 ClipboardType::Regular,
                 Seat::Unspecified,
-                MimeType::Specific(&mime),
+                paste_mime,
             );
             match result {
                 Ok((mut pipe, _)) => {

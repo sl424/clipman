@@ -137,7 +137,7 @@ dependencies = [
  "serde_cbor 0.10.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_json 1.0.41 (registry+https://github.com/rust-lang/crates.io-index)",
  "structopt 0.3.3 (registry+https://github.com/rust-lang/crates.io-index)",
- "wl-clipboard-rs 0.3.0 (git+https://github.com/yory8/wl-clipboard-rs?branch=multi)",
+ "wl-clipboard-rs 0.3.0 (git+https://github.com/YaLTeR/wl-clipboard-rs)",
 ]
 
 [[package]]
@@ -970,7 +970,7 @@ dependencies = [
 [[package]]
 name = "wl-clipboard-rs"
 version = "0.3.0"
-source = "git+https://github.com/yory8/wl-clipboard-rs?branch=multi#6ee75c9a556e1dfefdcca0fe3a82fd23fc2e31fc"
+source = "git+https://github.com/YaLTeR/wl-clipboard-rs#d223a4993457d2194540b0a48074761b217efc4f"
 dependencies = [
  "derive-new 0.5.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "derive_more 0.14.1 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1114,5 +1114,5 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 "checksum winapi-i686-pc-windows-gnu 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)" = "ac3b87c63620426dd9b991e5ce0329eff545bccbbb34f3be09ff6fb6ab51b7b6"
 "checksum winapi-x86_64-pc-windows-gnu 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)" = "712e227841d057c1ee1cd2fb22fa7e5a5461ae8e48fa2ca79ec42cfc1931183f"
 "checksum wincolor 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)" = "eeb06499a3a4d44302791052df005d5232b927ed1a9658146d842165c4de7767"
-"checksum wl-clipboard-rs 0.3.0 (git+https://github.com/yory8/wl-clipboard-rs?branch=multi)" = "<none>"
+"checksum wl-clipboard-rs 0.3.0 (git+https://github.com/YaLTeR/wl-clipboard-rs)" = "<none>"
 "checksum xml-rs 0.8.0 (registry+https://github.com/rust-lang/crates.io-index)" = "541b12c998c5b56aa2b4e6f18f03664eef9a4fd0a246a55594efae6cc2d964b5"

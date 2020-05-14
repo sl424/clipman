@@ -27,6 +27,7 @@ var (
 	maxDemon  = storer.Flag("max-items", "history size").Default("15").Int()
 	noPersist = storer.Flag("no-persist", "Don't persist a copy buffer after a program exits").Short('P').Default("false").Bool()
 	unix      = storer.Flag("unix", "Normalize line endings to LF").Bool()
+	noSingle  = storer.Flag("no-single", "Don't store single ASCII characters").Bool()
 
 	picker       = app.Command("pick", "Pick an item from clipboard history")
 	maxPicker    = picker.Flag("max-items", "scrollview length").Default("15").Int()
@@ -68,6 +69,11 @@ func main() {
 			smartLog("Couldn't get input from stdin.", "critical", *alert)
 		}
 		text := strings.Join(stdin, "")
+
+		if *noSingle && len(text) == 1 && []byte(text)[0] <= 128 {
+			// ignore a single ascii character, we almost certainly don't want it stored
+			return
+		}
 
 		persist := !*noPersist
 		if err := store(text, history, histfile, *maxDemon, persist); err != nil {

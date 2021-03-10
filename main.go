@@ -41,6 +41,8 @@ var (
 	clearAll      = clearer.Flag("all", "Remove all items").Short('a').Default("false").Bool()
 	clearEsc      = clearer.Flag("print0", "Separate items using NULL; recommended if your tool supports --read0 or similar").Default("false").Bool()
 
+	showHistory = app.Command("show-history", "Show all items from history")
+
 	_ = app.Command("restore", "Serve the last recorded item from history")
 )
 
@@ -90,6 +92,14 @@ func main() {
 		}
 
 		serveTxt(history[len(history)-1])
+	case "show-history":
+		if len(history) != 0 {
+			urlsJson, _ := json.Marshal(history)
+			fmt.Println(string(urlsJson))
+			return
+		}
+		fmt.Println("Nothing to show")
+		return
 	case "clear":
 		// remove all history
 		if *clearAll {

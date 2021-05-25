@@ -22,6 +22,7 @@ var (
 	app      = kingpin.New("clipman", "A clipboard manager for Wayland")
 	histpath = app.Flag("histpath", "Path of history file").Default("~/.local/share/clipman.json").String()
 	alert    = app.Flag("notify", "Send desktop notifications on errors").Bool()
+	primary  = app.Flag("primary", "serveTxt to primary clipboard").Default("false").Bool()
 
 	storer    = app.Command("store", "Record clipboard events (run as argument to `wl-paste --watch`)")
 	maxDemon  = storer.Flag("max-items", "history size").Default("15").Int()
@@ -200,6 +201,12 @@ func serveTxt(s string) {
 	cmd := exec.Cmd{Path: bin, Args: []string{bin, "-t", "TEXT"}, Stdin: strings.NewReader(s), SysProcAttr: attr}
 	if err := cmd.Run(); err != nil {
 		smartLog(fmt.Sprintf("error running wl-copy: %s\n", err), "low", *alert)
+	}
+	if *primary {
+		cmd := exec.Cmd{Path: bin, Args: []string{bin, "-p", "-t", "TEXT"}, Stdin: strings.NewReader(s), SysProcAttr: attr}
+		if err := cmd.Run(); err != nil {
+			smartLog(fmt.Sprintf("error running wl-copy -p: %s\n", err), "low", *alert)
+		}
 	}
 }
 

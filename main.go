@@ -198,16 +198,15 @@ func serveTxt(s string) {
 	}
 
 	// we mandate the mime type because we know we can only serve text; not doing this leads to weird bugs like #35
-	if !*primary {
-		cmd := exec.Cmd{Path: bin, Args: []string{bin, "-t", "TEXT"}, Stdin: strings.NewReader(s), SysProcAttr: attr}
-		if err := cmd.Run(); err != nil {
-			smartLog(fmt.Sprintf("error running wl-copy: %s\n", err), "low", *alert)
-		}
-	}
 	if *primary {
 		cmd := exec.Cmd{Path: bin, Args: []string{bin, "-p", "-t", "TEXT"}, Stdin: strings.NewReader(s), SysProcAttr: attr}
 		if err := cmd.Run(); err != nil {
 			smartLog(fmt.Sprintf("error running wl-copy -p: %s\n", err), "low", *alert)
+		}
+	} else {
+		cmd := exec.Cmd{Path: bin, Args: []string{bin, "-t", "TEXT"}, Stdin: strings.NewReader(s), SysProcAttr: attr}
+		if err := cmd.Run(); err != nil {
+			smartLog(fmt.Sprintf("error running wl-copy: %s\n", err), "low", *alert)
 		}
 	}
 }

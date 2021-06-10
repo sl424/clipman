@@ -17,9 +17,7 @@ Requirements:
 
 ### Distros
 
-These distros ship with clipman binaries in their repos:
-
-[![Packaging status](https://repology.org/badge/vertical-allrepos/clipman.svg)](https://repology.org/project/clipman/versions)
+A few distros ship with clipman binaries in their official or unofficial repos.
 
 ## Usage
 

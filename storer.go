@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -11,12 +12,15 @@ func store(text string, history []string, histfile string, max int, persist bool
 		return nil
 	}
 
+	//base64 encoding
+	text_base64 := base64.StdEncoding.EncodeToString([]byte(text))
+
 	l := len(history)
 	if l > 0 {
 		// this avoids entering an endless loop,
 		// see https://github.com/bugaevc/wl-clipboard/issues/65
 		last := history[l-1]
-		if text == last {
+		if text_base64 == last {
 			return nil
 		}
 
@@ -28,10 +32,11 @@ func store(text string, history []string, histfile string, max int, persist bool
 		}
 
 		// remove duplicates
-		history = filter(history, text)
+		history = filter(history, text_base64)
 	}
 
-	history = append(history, text)
+
+	history = append(history, text_base64)
 
 	// dump history to file so that other apps can query it
 	if err := write(history, histfile); err != nil {

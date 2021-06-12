@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	"strconv"
 	"strings"
+	"encoding/base64"
 
 	"github.com/kballard/go-shellquote"
 )
@@ -101,7 +102,7 @@ func selector(data []string, max int, tool, prompt, toolArgs string, null bool) 
 	if b[len(b)-1] == '\n' {
 		b = b[:len(b)-1]
 	}
-	sel, ok := guide[string(b)]
+	sel, ok := guide[strings.Split(string(b), ":")[0]]
 	if !ok {
 		return "", errors.New("couldn't recover original string")
 	}
@@ -118,9 +119,12 @@ func preprocessData(data []string, maxChars int, escape bool) ([]string, map[str
 	var escaped []string
 	guide := make(map[string]string)
 
+	count := 0
 	for i := len(data) - 1; i >= 0; i-- { // reverse slice
-		original := data[i]
-		repr := original
+		original_byte, _ := base64.StdEncoding.DecodeString(data[i])
+		original := string(original_byte)
+		repr := strconv.Itoa(count)+":"+original
+		fmt.Printf("length: %d\n", len(original))
 
 		// escape newlines
 		if escape {
@@ -136,8 +140,9 @@ func preprocessData(data []string, maxChars int, escape bool) ([]string, map[str
 			repr = repr[:maxChars]
 		}
 
-		guide[repr] = original
+		guide[strconv.Itoa(count)] = original
 		escaped = append(escaped, repr)
+		count++
 	}
 
 	return escaped, guide

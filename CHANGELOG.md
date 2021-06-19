@@ -3,6 +3,12 @@
 **New features**
 
 - `--unix` option to normalize all line endings to LF
+- `--primary` option to serve the selection to `primary` instead than `clipboard`
+- `show-history` command to obtain a json representation of the clipboard's history
+
+**Other changes**
+
+- when using the `bemenu` tool we don't forcefully set it to bottom position anymore
 
 # 1.5.2
 

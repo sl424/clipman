@@ -42,12 +42,15 @@ func store(text string, history []string, histfile string, max int, persist bool
 
 	// make the copy buffer available to all applications,
 	// even when the source has disappeared
-	// TEXT only
+	// text/plain filetype only
 	if persist {
 		var exitError *exec.ExitError
 		bin, err := exec.LookPath("wl-paste")
-		cmd := exec.Cmd{Path: bin, Args: []string{bin, "-t", "TEXT"}}
-		if err = cmd.Run(); err != nil {
+		if err != nil {
+			smartLog(fmt.Sprintf("couldn't find wl-paste: %v\n", err), "low", *alert)
+		}
+		cmd := exec.Cmd{Path: bin, Args: []string{bin, "-t", "text/plain"}}
+		if err := cmd.Run(); err != nil {
 			if errors.As(err, &exitError) {
 				return nil
 			}

@@ -111,7 +111,7 @@ func selector(data []string, max int, tool, prompt, toolArgs string, null bool) 
 
 // preprocessData:
 // - reverses the data
-// - optionally escapes \n and \t (it would break some external selectors)
+// - optionally escapes \n, \r and \t (it would break some external selectors)
 // - optionally it cuts items longer than maxChars bytes (dmenu doesn't allow more than ~1200)
 // A guide is created to allow restoring the selected item.
 func preprocessData(data []string, maxChars int, escape bool) ([]string, map[string]string) {
@@ -128,6 +128,8 @@ func preprocessData(data []string, maxChars int, escape bool) ([]string, map[str
 			repr = strings.ReplaceAll(repr, "\n", "\\n")
 			repr = strings.ReplaceAll(repr, "\\t", "\\\\t")
 			repr = strings.ReplaceAll(repr, "\t", "\\t")
+			repr = strings.ReplaceAll(repr, "\\r", "\\\\r")
+			repr = strings.ReplaceAll(repr, "\r", "\\r")
 		}
 		// optionally cut to maxChars
 		if maxChars > 0 && len(repr) > maxChars {

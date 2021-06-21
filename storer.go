@@ -2,8 +2,10 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
+	"os/exec"
 )
 
 func store(text string, history []string, histfile string, max int, persist bool) error {
@@ -40,7 +42,16 @@ func store(text string, history []string, histfile string, max int, persist bool
 
 	// make the copy buffer available to all applications,
 	// even when the source has disappeared
+	// TEXT only
 	if persist {
+		var exitError *exec.ExitError
+		bin, err := exec.LookPath("wl-paste")
+		cmd := exec.Cmd{Path: bin, Args: []string{bin, "-t", "TEXT"}}
+		if err = cmd.Run(); err != nil {
+			if errors.As(err, &exitError) {
+				return nil
+			}
+		}
 		serveTxt(text)
 	}
 

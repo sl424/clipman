@@ -23,7 +23,7 @@ var (
 	histpath = app.Flag("histpath", "Path of history file").Default("~/.local/share/clipman.json").String()
 	alert    = app.Flag("notify", "Send desktop notifications on errors").Bool()
 	primary  = app.Flag("primary", "Serve item to the primary clipboard").Default("false").Bool()
-	setMIME = app.Flag("mime", "override MIME type").Default("-t TEXT").String()
+	mimeconv = app.Flag("mimeconv", "override default buffer MIME type in corner cases").Default("-t TEXT").String()
 
 	storer    = app.Command("store", "Record clipboard events (run as argument to `wl-paste --watch`)")
 	maxDemon  = storer.Flag("max-items", "history size").Default("15").Int()
@@ -54,7 +54,7 @@ func main() {
 	app.VersionFlag.Short('v')
 	action := kingpin.MustParse(app.Parse(os.Args[1:]))
 
-	fmt.Println(strings.Fields("wl-copy -p "+*setMIME))
+	fmt.Println(strings.Fields("wl-copy " + *mimeconv))
 
 	histfile, history, err := getHistory(*histpath)
 	if err != nil {
@@ -203,13 +203,13 @@ func serveTxt(s string) {
 
 	// we mandate the mime type because we know we can only serve text; not doing this leads to weird bugs like #35
 	if *primary {
-		args := strings.Fields(bin+" -p "+*setMIME)
+		args := strings.Fields(bin + " -p " + *mimeconv)
 		cmd := exec.Cmd{Path: bin, Args: args, Stdin: strings.NewReader(s), SysProcAttr: attr}
 		if err := cmd.Run(); err != nil {
 			smartLog(fmt.Sprintf("error running wl-copy -p: %s\n", err), "low", *alert)
 		}
 	} else {
-		args:= strings.Fields(bin+" "+*setMIME)
+		args := strings.Fields(bin + " " + *mimeconv)
 		cmd := exec.Cmd{Path: bin, Args: args, Stdin: strings.NewReader(s), SysProcAttr: attr}
 		if err := cmd.Run(); err != nil {
 			smartLog(fmt.Sprintf("error running wl-copy: %s\n", err), "low", *alert)

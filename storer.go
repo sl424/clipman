@@ -5,6 +5,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"strings"
+
+	"image"
+	_ "image/gif"
+	_ "image/png"
+	_ "image/jpeg"
+	//_ "code.google.com/p/vp8-go/webp"
 )
 
 func store(text string, history []string, histfile string, max int, persist bool) error {
@@ -12,15 +19,22 @@ func store(text string, history []string, histfile string, max int, persist bool
 		return nil
 	}
 
-	//base64 encoding
-	text_base64 := base64.StdEncoding.EncodeToString([]byte(text))
+	//Encode in base64 if its image format
+	_, format, err := image.DecodeConfig(strings.NewReader(text))
+	if err != nil {
+		//log error
+	} else {
+		//encode the text in base64
+		text = base64.StdEncoding.EncodeToString([]byte(text))
+		fmt.Println("[!] image detected: ", format)
+	}
 
 	l := len(history)
 	if l > 0 {
 		// this avoids entering an endless loop,
 		// see https://github.com/bugaevc/wl-clipboard/issues/65
 		last := history[l-1]
-		if text_base64 == last {
+		if text == last {
 			return nil
 		}
 
@@ -32,11 +46,11 @@ func store(text string, history []string, histfile string, max int, persist bool
 		}
 
 		// remove duplicates
-		history = filter(history, text_base64)
+		history = filter(history, text)
 	}
 
 
-	history = append(history, text_base64)
+	history = append(history, text)
 
 	// dump history to file so that other apps can query it
 	if err := write(history, histfile); err != nil {

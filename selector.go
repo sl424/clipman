@@ -1,25 +1,42 @@
 package main
 
 import (
+	"encoding/base64"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"os/exec"
 	"strconv"
 	"strings"
-	"encoding/base64"
 
 	"github.com/kballard/go-shellquote"
+	"image"
+	_ "image/gif"
+	_ "image/png"
+	_ "image/jpeg"
+	//_ "code.google.com/p/vp8-go/webp"
 )
 
+var pngStr = "\x89\x50\x4e\x47"
+var jpgStr = "\xff\xd8\xff\xe0"
+var svgStr = "<svg"
+
 func selector(data []string, max int, tool, prompt, toolArgs string, null bool) (string, error) {
+	dir, dirErr := ioutil.TempDir("", "clipman.*.dir")
+	if dirErr != nil {
+		return "", fmt.Errorf("selector: %w", dirErr)
+	}
+	fmt.Println("[!] create tmp dir: ", dir)
+	defer os.RemoveAll(dir)
+
 	if len(data) == 0 {
 		return "", errors.New("nothing to show: no data available")
 	}
 
 	// output to stdout and return
 	if tool == "STDOUT" {
-		escaped, _ := preprocessData(data, 0, !null)
+		escaped, _ := preprocessData(data, 0, !null, dir)
 		sep := "\n"
 		if null {
 			sep = "\000"
@@ -75,7 +92,7 @@ func selector(data []string, max int, tool, prompt, toolArgs string, null bool) 
 		return "", fmt.Errorf("%s is not installed", tool)
 	}
 
-	processed, guide := preprocessData(data, 1000, !null)
+	processed, guide := preprocessData(data, 1000, !null, dir)
 	sep := "\n"
 	if null {
 		sep = "\000"
@@ -94,7 +111,7 @@ func selector(data []string, max int, tool, prompt, toolArgs string, null bool) 
 	}
 
 	// we received no selection; wofi doesn't error in this case
-	if len(b) == 0 {
+	if len(b) == 0 || len(b) == 1 && b[0] == '\n' {
 		return "", nil
 	}
 
@@ -115,16 +132,39 @@ func selector(data []string, max int, tool, prompt, toolArgs string, null bool) 
 // - optionally escapes \n, \r and \t (it would break some external selectors)
 // - optionally it cuts items longer than maxChars bytes (dmenu doesn't allow more than ~1200)
 // A guide is created to allow restoring the selected item.
-func preprocessData(data []string, maxChars int, escape bool) ([]string, map[string]string) {
+func preprocessData(data []string, maxChars int, escape bool, tmpdir string) ([]string, map[string]string) {
 	var escaped []string
+	escaped = append(escaped, "") // append first line as empty
 	guide := make(map[string]string)
 
 	count := 0
 	for i := len(data) - 1; i >= 0; i-- { // reverse slice
-		original_byte, _ := base64.StdEncoding.DecodeString(data[i])
-		original := string(original_byte)
-		repr := strconv.Itoa(count)+":"+original
-		fmt.Printf("length: %d\n", len(original))
+		countStr := strconv.Itoa(count)
+		original := data[i]
+		repr := countStr + ": " + original
+
+		//decode data as image, write to temporary directory
+		reader := base64.NewDecoder(base64.StdEncoding, strings.NewReader(original))
+		_, format, err := image.DecodeConfig(reader)
+		if err != nil {
+			smartLog(err.Error(), "low", *alert)
+		} 
+		if format != "" {
+			b, _ := base64.StdEncoding.DecodeString(data[i])
+			original = string(b)
+			tmpfile, err := ioutil.TempFile(tmpdir, "preview-")
+			if err != nil {
+				smartLog(err.Error(), "low", *alert)
+			}
+			if _, err := tmpfile.Write(b); err != nil {
+				smartLog(err.Error(), "low", *alert)
+			}
+			if err := tmpfile.Close(); err != nil {
+				smartLog(err.Error(), "low", *alert)
+			}
+			repr = countStr + ": :" + "img:" + tmpfile.Name()
+		}
+		fmt.Printf("length: %d\n", len(data[i]) )
 
 		// escape newlines
 		if escape {
@@ -140,7 +180,7 @@ func preprocessData(data []string, maxChars int, escape bool) ([]string, map[str
 			repr = repr[:maxChars]
 		}
 
-		guide[strconv.Itoa(count)] = original
+		guide[countStr] = original
 		escaped = append(escaped, repr)
 		count++
 	}

@@ -23,7 +23,7 @@ var (
 	histpath = app.Flag("histpath", "Path of history file").Default("~/.local/share/clipman.json").String()
 	alert    = app.Flag("notify", "Send desktop notifications on errors").Bool()
 	primary  = app.Flag("primary", "Serve item to the primary clipboard").Default("false").Bool()
-	mimeconv = app.Flag("mimeconv", "override default buffer MIME type in corner cases").Default("-t TEXT").String()
+	mimeconv = app.Flag("mimeconv", "override default buffer MIME type in corner cases").Default("").String()
 
 	storer    = app.Command("store", "Record clipboard events (run as argument to `wl-paste --watch`)")
 	maxDemon  = storer.Flag("max-items", "history size").Default("15").Int()

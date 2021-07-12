@@ -1,3 +1,10 @@
+# image_hack
+
+this is a simple hack to allow image support with wofi. This also means revert bug [#35]("https://github.com/yory8/clipman/issues/35") fix.
+
+Bind this in the sway config `exec clipman --notify pick --tool="wofi" --tool-args="--allow-images"`
+
+
 # Clipman
 
 A basic clipboard manager for Wayland, with support for persisting copy buffers after an application exits.
